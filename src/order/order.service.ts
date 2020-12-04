@@ -5,13 +5,17 @@ import {
 } from '@nestjs/common';
 import { Item } from 'src/entity/item.entity';
 import { Order } from 'src/entity/order.entity';
+import { itemRepository } from 'src/Repository/item.repository';
 import { orderRepository } from 'src/Repository/order.repository';
 import { getConnection } from 'typeorm';
 import { OrderCreateDto } from './dto/order.dto';
 
 @Injectable()
 export class OrderService {
-  constructor(private readonly orderRepository: orderRepository) {}
+  constructor(
+    private readonly orderRepository: orderRepository,
+    private readonly itemRepository: itemRepository,
+  ) {}
   async GetOrder() {
     try {
       const find = await this.orderRepository.find({ relations: ['item'] });
@@ -32,7 +36,6 @@ export class OrderService {
     let err = '';
     const { postcode, sender, receiver, address, status, item } = body;
 
-    
     const order = new Order();
 
     try {
@@ -50,7 +53,7 @@ export class OrderService {
         items.order = order;
         await queryRunner.manager.save(items);
       }
-      
+
       await queryRunner.commitTransaction();
     } catch (error) {
       console.log('error message ::', error.message);
@@ -70,7 +73,35 @@ export class OrderService {
     }
   }
 
-  async GetById(id:number){
-    return await this.orderRepository.getProductById(id)
+  async GetById(id: number) {
+    return await this.orderRepository.getProductById(id);
+  }
+
+  async updateOrder(id: number, body: OrderCreateDto) {
+    const { postcode, sender, receiver, address, status, item } = body;
+    const find_order = await this.itemRepository.find({ where: { order: id } });
+    console.log(find_order);
+  }
+
+  async deleteOrder(id: number) {
+    try {
+      const find = await this.orderRepository.findOne({ where: { id: id } });
+      if (!find) throw new Error(`id ${id} not found`);
+      await getConnection()
+        .createQueryBuilder()
+        .delete()
+        .from(Order)
+        .where('id = :id', { id: id })
+        .execute();
+      return {
+        success: true,
+        message: `delete id ${id} sucess`,
+      };
+    } catch (error) {
+      throw new NotFoundException({
+        success: false,
+        message: error.message,
+      });
+    }
   }
 }

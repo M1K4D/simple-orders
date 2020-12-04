@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
 } from '@nestjs/common';
 import { OrderCreateDto } from './dto/order.dto';
@@ -25,6 +27,19 @@ export class OrderController {
 
   @Get(':id/getbyid')
   async getbyId(@Param('id', ParseIntPipe) id: number) {
-      return this.orderService.GetById(id)
+    return this.orderService.GetById(id);
+  }
+
+  @Patch(':id/update')
+  async updateOrder(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: OrderCreateDto,
+  ) {
+    return this.orderService.updateOrder(id, body);
+  }
+
+  @Delete(':id/delete')
+  async deleteOrder(@Param('id', ParseIntPipe) id) {
+    return this.orderService.deleteOrder(id);
   }
 }

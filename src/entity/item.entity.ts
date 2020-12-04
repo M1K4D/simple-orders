@@ -21,6 +21,6 @@ export class Item extends BaseEntity {
   @Column()
   quanity: number;
 
-  @ManyToOne(() => Order, (order) => order.id)
+  @ManyToOne(() => Order, (order) => order.id, { onDelete: 'CASCADE' })
   order: Order;
 }

@@ -27,6 +27,6 @@ export class Order extends BaseEntity {
   @Column({ type: 'varchar', length: '255' })
   status: string;
 
-  @OneToMany(() => Item, (item) => item.order)
+  @OneToMany(() => Item, (item) => item.order, { cascade: true })
   item: Item[];
 }

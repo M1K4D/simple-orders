@@ -79,8 +79,9 @@ export class OrderService {
 
   async updateOrder(id: number, body: OrderCreateDto) {
     const { postcode, sender, receiver, address, status, item } = body;
-    const find_order = await this.itemRepository.find({ where: { order: id } });
-    console.log(find_order);
+    const find_item = await this.itemRepository.find({ where: { order: id } });
+    
+    console.log(find_item);
   }
 
   async deleteOrder(id: number) {

@@ -1,4 +1,5 @@
-import { IsNumber, IsString } from 'class-validator';
+import { IsArray, IsNumber, IsString } from 'class-validator';
+import { ItemCreateDto } from './item.dto';
 // import { IsString } from 'class-validator/types/decorator/typechecker/IsString';
 
 export class OrderCreateDto {
@@ -17,12 +18,6 @@ export class OrderCreateDto {
   @IsString()
   status: string;
 
-  @IsString()
-  sku_code: string;
-
-  @IsString()
-  sku_name: string;
-
-  @IsNumber()
-  quantity: number;
+  // @IsArray()
+  item: ItemCreateDto[];
 }

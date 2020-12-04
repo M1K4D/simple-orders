@@ -1,5 +1,5 @@
-import { IsNumber } from 'class-validator';
-import { IsString } from 'class-validator/types/decorator/typechecker/IsString';
+import { IsNumber, IsString } from 'class-validator';
+// import { IsString } from 'class-validator/types/decorator/typechecker/IsString';
 
 export class OrderCreateDto {
   @IsString()

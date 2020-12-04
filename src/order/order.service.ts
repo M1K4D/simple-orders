@@ -69,4 +69,8 @@ export class OrderService {
       };
     }
   }
+
+  async GetById(id:number){
+    return await this.orderRepository.getProductById(id)
+  }
 }

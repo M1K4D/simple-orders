@@ -4,7 +4,7 @@ import { EntityRepository, Repository } from 'typeorm';
 
 @EntityRepository(Order)
 export class orderRepository extends Repository<Order> {
-  async getProductById(id: number): Promise<Order> {
+  async getOrderById(id: number): Promise<Order> {
     try {
       const data = await this.findOne({
         where: { id: id },

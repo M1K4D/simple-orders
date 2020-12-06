@@ -30,12 +30,13 @@ export class OrderController {
     return this.orderService.GetById(id);
   }
 
-  @Patch(':id/update')
+  @Patch('/update/order/:id/item/:iditem/')
   async updateOrder(
     @Param('id', ParseIntPipe) id: number,
+    @Param('iditem', ParseIntPipe) id_item: number,
     @Body() body: OrderCreateDto,
   ) {
-    return this.orderService.updateOrder(id, body);
+    return this.orderService.updateOrder(id, id_item, body);
   }
 
   @Delete(':id/delete')

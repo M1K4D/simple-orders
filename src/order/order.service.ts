@@ -74,14 +74,53 @@ export class OrderService {
   }
 
   async GetById(id: number) {
-    return await this.orderRepository.getProductById(id);
+    return await this.orderRepository.getOrderById(id);
   }
 
-  async updateOrder(id: number, body: OrderCreateDto) {
+  async updateOrder(id: number, id_item: number, body: OrderCreateDto) {
     const { postcode, sender, receiver, address, status, item } = body;
-    const find_item = await this.itemRepository.find({ where: { order: id } });
-    
-    console.log(find_item);
+    const find_item = await this.itemRepository.findOne({
+      where: { id: id_item },
+    });
+    const find_order = await this.orderRepository.findOne({
+      where: { id: id },
+    });
+    try {
+      await getConnection()
+        .createQueryBuilder()
+        .update(Order)
+        .set({
+          postcode: postcode,
+          sender: sender,
+          receiver: receiver,
+          address: address,
+          status: status,
+        })
+        .where('id = :id', { id: find_order.id })
+        .execute();
+
+      await getConnection()
+        .createQueryBuilder()
+        .update(Item)
+        .set({
+          sku_code: item[0].sku_code,
+          sku_name: item[0].sku_name,
+          quanity: item[0].quantity,
+        })
+        .where('id = :id', { id: find_item.id })
+        .execute();
+
+      return {
+        sucess: true,
+        message: `update sucess`,
+      };
+    } catch (error) {
+      console.log(error.message)
+      throw new BadRequestException({
+        sucess: false,
+        message: error.message,
+      });
+    }
   }
 
   async deleteOrder(id: number) {

@@ -86,6 +86,8 @@ export class OrderService {
       where: { id: id },
     });
     try {
+      if(!find_order) throw new Error(`Not Found Order id ${id}`)
+      if(!find_item) throw new Error(`Not Found Item id ${id_item}`)
       await getConnection()
         .createQueryBuilder()
         .update(Order)

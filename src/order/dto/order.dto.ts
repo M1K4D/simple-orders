@@ -1,4 +1,4 @@
-import { IsArray, IsNumber, IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import { ItemCreateDto } from './item.dto';
 // import { IsString } from 'class-validator/types/decorator/typechecker/IsString';
 
@@ -19,5 +19,6 @@ export class OrderCreateDto {
   status: string;
 
   // @IsArray()
+  @IsOptional()
   item: ItemCreateDto[];
 }

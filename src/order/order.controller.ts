@@ -7,11 +7,14 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { OrderCreateDto } from './dto/order.dto';
 import { OrderService } from './order.service';
 
 @Controller('order')
+@UsePipes(new ValidationPipe())
 export class OrderController {
   constructor(private orderService: OrderService) {}
 

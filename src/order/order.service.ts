@@ -21,16 +21,31 @@ export class OrderService {
     private readonly itemRepository: itemRepository,
   ) {}
 
-  async fetch() {
+  async fetch(sku_code: any) {
+    const option = {
+      method: 'POST',
+      url: 'http://192.168.1.136:3000/products/getbyskucode',
+      body: {
+        sku_code: sku_code,
+      },
+      json: true,
+    };
+    const data = await Fetch(option);
+    const _body = data.body;
+    console.log(_body);
+    return _body.success;
+  }
+
+  async getFrompro() {
     const option = {
       method: 'GET',
       url: 'http://192.168.1.136:3000/products/getproduct',
     };
 
     const data = await Fetch(option);
-    const body = JSON.parse(data.body);
-    console.log(body)
-    return body
+    const _body = JSON.parse(data.body);
+    console.log(_body);
+    return _body;
   }
 
   async getOrder() {
@@ -54,7 +69,6 @@ export class OrderService {
     const { postcode, sender, receiver, address, status, item } = body;
 
     const order = new Order();
-
     try {
       order.postcode = postcode;
       order.sender = sender;
@@ -63,6 +77,9 @@ export class OrderService {
       order.status = status;
       await queryRunner.manager.save(order);
       for (const _item of item) {
+        const find_product = await this.fetch(_item.sku_code)
+        console.log(find_product)
+        if(!find_product) throw new Error(`Not Found sku code ${_item.sku_code}`)
         console.log(_item);
         const items = new Item();
         items.sku_code = _item.sku_code;
@@ -91,7 +108,7 @@ export class OrderService {
     }
   }
 
-  async GetById(id: number) {
+  async getById(id: number) {
     return await this.orderRepository.getOrderById(id);
   }
 

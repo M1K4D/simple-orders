@@ -30,7 +30,7 @@ export class OrderController {
 
   @Get(':id/getbyid')
   async getbyId(@Param('id', ParseIntPipe) id: number) {
-    return await this.orderService.GetById(id);
+    return await this.orderService.getById(id);
   }
 
   @Patch('/update/order/:id/item/:iditem')
@@ -47,8 +47,13 @@ export class OrderController {
     return await this.orderService.deleteOrder(id);
   }
 
+  // @Get('test')
+  // async fetch() {
+  //   return await this.orderService.fetch();
+  // }
+
   @Get()
-  async fetch() {
-    return await this.orderService.fetch();
+  async getProduct() {
+    return await this.orderService.getFrompro();
   }
 }

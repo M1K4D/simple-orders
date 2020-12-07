@@ -20,30 +20,35 @@ export class OrderController {
 
   @Get('getorder')
   async GetOder() {
-    return this.orderService.GetOrder();
+    return await this.orderService.getOrder();
   }
 
   @Post('create')
   async createOrder(@Body() body: OrderCreateDto) {
-    return this.orderService.createOrder(body);
+    return await this.orderService.createOrder(body);
   }
 
   @Get(':id/getbyid')
   async getbyId(@Param('id', ParseIntPipe) id: number) {
-    return this.orderService.GetById(id);
+    return await this.orderService.GetById(id);
   }
 
-  @Patch('/update/order/:id/item/:iditem/')
+  @Patch('/update/order/:id/item/:iditem')
   async updateOrder(
     @Param('id', ParseIntPipe) id: number,
     @Param('iditem', ParseIntPipe) id_item: number,
     @Body() body: OrderCreateDto,
   ) {
-    return this.orderService.updateOrder(id, id_item, body);
+    return await this.orderService.updateOrder(id, id_item, body);
   }
 
   @Delete(':id/delete')
   async deleteOrder(@Param('id', ParseIntPipe) id) {
-    return this.orderService.deleteOrder(id);
+    return await this.orderService.deleteOrder(id);
+  }
+
+  @Get()
+  async fetch() {
+    return await this.orderService.fetch();
   }
 }

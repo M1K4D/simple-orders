@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ItemCreateDto } from 'src/order/dto/item.dto';
 import { ItemService } from './item.service';
 
@@ -12,7 +22,15 @@ export class ItemController {
 
   @Patch(':id/update')
   @UsePipes(new ValidationPipe())
-  async updateItem(@Param('id', ParseIntPipe) id: number,@Body()body:ItemCreateDto){
-      return this.itemService.updateItem(id,body)
-  };
+  async updateItem(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: ItemCreateDto,
+  ) {
+    return this.itemService.updateItem(id, body);
+  }
+
+  @Delete(':id/delete')
+  async deleteItem(@Param('id', ParseIntPipe) id: number) {
+    return this.itemService.deleteItem(id)
+  }
 }

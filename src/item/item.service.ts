@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Item } from 'src/entity/item.entity';
 import { ItemCreateDto } from 'src/order/dto/item.dto';
 import { itemRepository } from 'src/Repository/item.repository';
@@ -34,6 +34,28 @@ export class ItemService {
       console.log(error.message);
       throw new BadRequestException({
         sucess: false,
+        message: error.message,
+      });
+    }
+  }
+
+  async deleteItem(id: number) {
+    try {
+      const find = await this.itemRepository.findOne({ where: { id: id } });
+      if (!find) throw new Error(`id ${id} not found`);
+      await getConnection()
+        .createQueryBuilder()
+        .delete()
+        .from(Item)
+        .where('id = :id', { id: id })
+        .execute();
+      return {
+        success: true,
+        message: `delete id ${id} sucess`,
+      };
+    } catch (error) {
+      throw new NotFoundException({
+        success: false,
         message: error.message,
       });
     }

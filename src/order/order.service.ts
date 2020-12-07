@@ -9,6 +9,10 @@ import { itemRepository } from 'src/Repository/item.repository';
 import { orderRepository } from 'src/Repository/order.repository';
 import { getConnection } from 'typeorm';
 import { OrderCreateDto } from './dto/order.dto';
+import * as request from 'request';
+import { promisify } from 'util';
+
+const Fetch = promisify(request);
 
 @Injectable()
 export class OrderService {
@@ -16,7 +20,20 @@ export class OrderService {
     private readonly orderRepository: orderRepository,
     private readonly itemRepository: itemRepository,
   ) {}
-  async GetOrder() {
+
+  async fetch() {
+    const option = {
+      method: 'GET',
+      url: 'http://192.168.1.136:3000/products/getproduct',
+    };
+
+    const data = await Fetch(option);
+    const body = JSON.parse(data.body);
+    console.log(body)
+    return body
+  }
+
+  async getOrder() {
     try {
       const find = await this.orderRepository.find({ relations: ['item'] });
       //   if(find.length == 0) throw new Error('Not found data')
@@ -46,6 +63,7 @@ export class OrderService {
       order.status = status;
       await queryRunner.manager.save(order);
       for (const _item of item) {
+        console.log(_item);
         const items = new Item();
         items.sku_code = _item.sku_code;
         items.sku_name = _item.sku_name;
@@ -86,8 +104,8 @@ export class OrderService {
       where: { id: id },
     });
     try {
-      if(!find_order) throw new Error(`Not Found Order id ${id}`)
-      if(!find_item) throw new Error(`Not Found Item id ${id_item}`)
+      if (!find_order) throw new Error(`Not Found Order id ${id}`);
+      if (!find_item) throw new Error(`Not Found Item id ${id_item}`);
       await getConnection()
         .createQueryBuilder()
         .update(Order)
@@ -112,12 +130,21 @@ export class OrderService {
         .where('id = :id', { id: find_item.id })
         .execute();
 
+      if (item[0].quantity == 0) {
+        await getConnection()
+          .createQueryBuilder()
+          .delete()
+          .from(Item)
+          .where('id = :id', { id: find_item.id })
+          .execute();
+      }
+
       return {
         sucess: true,
         message: `update sucess`,
       };
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
       throw new BadRequestException({
         sucess: false,
         message: error.message,

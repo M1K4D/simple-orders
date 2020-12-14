@@ -21,19 +21,17 @@ export class OrderService {
     private readonly itemRepository: itemRepository,
   ) {}
 
-  async fetch(sku_code: any) {
+  async fetch(sku: any) {
     const option = {
       method: 'POST',
       url: 'http://192.168.1.136:3000/products/getbyskucode',
-      body: {
-        sku_code: sku_code,
-      },
+      body: sku,
       json: true,
     };
     const data = await Fetch(option);
     const _body = data.body;
-    console.log(_body);
-    return _body.success;
+    // console.log(_body);
+    return _body;
   }
 
   async getFrompro() {
@@ -44,6 +42,19 @@ export class OrderService {
 
     const data = await Fetch(option);
     const _body = JSON.parse(data.body);
+    // console.log("get" + _body);
+    return _body;
+  }
+
+  async fetchUpdate(sku: any) {
+    const option = {
+      method: 'PATCH',
+      url: `http://192.168.1.136:3000/products/updatequantity`,
+      body: sku,
+      json: true,
+    };
+    const data = await Fetch(option);
+    const _body = data.body;
     console.log(_body);
     return _body;
   }
@@ -76,15 +87,16 @@ export class OrderService {
       order.address = address;
       order.status = status;
       await queryRunner.manager.save(order);
-      for (const _item of item) {
-        const find_product = await this.fetch(_item.sku_code)
-        console.log(find_product)
-        if(!find_product) throw new Error(`Not Found sku code ${_item.sku_code}`)
-        console.log(_item);
+
+      const find_product = await this.fetch(item);
+      if (!find_product.success) throw new Error(`Not Found item`);
+      const update = await this.fetchUpdate(item);
+      if (!update.success) throw new BadRequestException(update);
+      for (const _item in item) {
         const items = new Item();
-        items.sku_code = _item.sku_code;
-        items.sku_name = _item.sku_name;
-        items.quanity = _item.quantity;
+        items.sku_code = item[_item].sku_code;
+        items.sku_name = item[_item].sku_name;
+        items.quanity = item[_item].quantity;
         items.order = order;
         await queryRunner.manager.save(items);
       }
@@ -123,6 +135,15 @@ export class OrderService {
     try {
       if (!find_order) throw new Error(`Not Found Order id ${id}`);
       if (!find_item) throw new Error(`Not Found Item id ${id_item}`);
+      // const test  = -(find_item.quanity - item[0].quantity)
+      // console.log(test)
+
+      const sku_update = [];
+      sku_update.push({
+        sku_code: item[0].sku_code,
+        quantity: -(find_item.quanity - item[0].quantity),
+      });
+
       await getConnection()
         .createQueryBuilder()
         .update(Order)
@@ -155,6 +176,8 @@ export class OrderService {
           .where('id = :id', { id: find_item.id })
           .execute();
       }
+      const update = await this.fetchUpdate(sku_update);
+      if (!update.success) throw new BadRequestException(update);
 
       return {
         sucess: true,

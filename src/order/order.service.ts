@@ -39,10 +39,8 @@ export class OrderService {
       method: 'GET',
       url: 'http://192.168.1.136:3000/products/getproduct',
     };
-
     const data = await Fetch(option);
     const _body = JSON.parse(data.body);
-    // console.log("get" + _body);
     return _body;
   }
 
@@ -62,7 +60,6 @@ export class OrderService {
   async getOrder() {
     try {
       const find = await this.orderRepository.find({ relations: ['item'] });
-      //   if(find.length == 0) throw new Error('Not found data')
       return {
         success: true,
         data: find,
@@ -135,8 +132,6 @@ export class OrderService {
     try {
       if (!find_order) throw new Error(`Not Found Order id ${id}`);
       if (!find_item) throw new Error(`Not Found Item id ${id_item}`);
-      // const test  = -(find_item.quanity - item[0].quantity)
-      // console.log(test)
 
       const sku_update = [];
       sku_update.push({
